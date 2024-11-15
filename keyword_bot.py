@@ -3,15 +3,16 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 from dotenv import load_dotenv
 
+# Load environment variables from the .env file
 load_dotenv()
 
-# Load your bot token from the .env file
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")  # The URL to use for the webhook
 
-# Define your list of keywords to monitor
-KEYWORDS = ["urgent", "mercado livre", "promoção", "cupom"]
+# List of keywords to monitor
+KEYWORDS = ["urgent", "mercado livre", "cupom", "promoção"]
 
-# Function to handle messages and check for keywords
+# Function to handle incoming messages and check for keywords
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = update.message.text.lower() if update.message and update.message.text else ""
     for keyword in KEYWORDS:
@@ -22,21 +23,24 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             )
             break
 
-# Start command to check if the bot is working
+# Function to handle the /start command
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("Keyword monitoring bot is active!")
 
 def main():
-    # Initialize the bot
     application = ApplicationBuilder().token(BOT_TOKEN).build()
 
-    # Register handlers
+    # Add handlers for commands and messages
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    # Start the bot
-    print("Bot is running...")
-    application.run_polling()
+    # Set up webhook
+    application.run_webhook(
+        listen="0.0.0.0",               # Bind to all available IP addresses
+        port=5000,                      # Use port 5000 (can be adjusted if needed)
+        url_path=f"{BOT_TOKEN}",
+        webhook_url=f"{WEBHOOK_URL}/{BOT_TOKEN}"
+    )
 
 if __name__ == "__main__":
     main()
