@@ -9,7 +9,7 @@ load_dotenv()
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 # Define your list of keywords to monitor
-KEYWORDS = ["urgent", "meeting", "error", "alert"]
+KEYWORDS = ["urgent", "mercado livre", "promoção", "cupom"]
 
 # Function to handle messages and check for keywords
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
